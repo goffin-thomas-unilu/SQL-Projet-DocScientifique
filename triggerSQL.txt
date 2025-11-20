@@ -1,0 +1,44 @@
+
+-- Création du trigger pour vérifier si la personne qui note l'article est un co-auteur
+DELIMITER //
+CREATE TRIGGER CO_Auteur_Trigger 
+BEFORE INSERT ON NOTER
+FOR EACH ROW
+BEGIN
+	IF EXISTS (SELECT 1 FROM NOTER WHERE NEW.NUMCHER = NUMCHER  AND NEW.NUMART = NUMART) 
+    	THEN
+    		SIGNAL SQLSTATE '45000'
+        	SET MESSAGE_TEXT = 'Erreur : Un chercheur ne peut pas noter un article dont il est co-auteur.';
+    END IF;
+END
+DELIMITER ;
+
+
+-- Création du trigger pour insérer dans la table log_chercheurs après une insertion sur la table annoter 
+DELIMITER ;
+CREATE TRIGGER insert_log_annoter 
+AFTER INSERT ON annoter
+FOR EACH ROW
+BEGIN
+	INSERT INTO log_chercheurs (NumCher,DATEJOUR,TYPE_ACTION) 
+    	VALUES (new.NumCher,NOW(),"INSERT");
+END;//            
+DELIMITER //
+
+
+-- Création du trigger pour insérer dans la table log_chercheurs après une mise à jour sur la table annoter 
+
+DELIMITER ;
+CREATE TRIGGER update_log_annoter
+AFTER UPDATE ON annoter
+FOR EACH ROW
+BEGIN
+	INSERT INTO log_chercheurs(NumCher,DATEJOUR,TYPE_ACTION)
+    	VALUES (NEW.NumCher,NOW(),"UPDATE");
+END;//            
+DELIMITER //
+
+
+pour la ligne INSERT INTO NOTER VALUES (5, 1, 4);
+celui-ci déclenche le trigger co-auteur
+

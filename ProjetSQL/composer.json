@@ -1,0 +1,9 @@
+{
+ "name": "s3/sql",
+ "type": "project",
+ "autoload": {
+    "psr-4": {
+        "sql\\action\\" : "action/"    
+    }
+ }
+}
